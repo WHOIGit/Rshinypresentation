@@ -1,7 +1,11 @@
+<!---
+All this should be 
+commented out
 -	What are you doing
 -	What level of expertise is needed
 -	What is needed on the persons laptop
 -	What knowledge they will walk away with
+-->
 
 ---
 
@@ -22,5 +26,5 @@ You'll need to bring this to the workshop
 1. A laptop computer with <a href = "https://www.rstudio.com/products/rstudio/download/#download" target = "_blank">Rstudio 1.1.447 </a> installed
 2. Familiarity with R: We'll assume some basic facility in R programming and that you can at least read and understand R code that creates custom plots in R's base graphics system. For the most part our explanation of R code will be limited to its relationship to app-building.
 
-`$we will be going over how to install shiny and dependencies during the presentation`
+`we will be going over how to install shiny and dependencies during the presentation`
 
