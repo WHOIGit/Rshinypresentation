@@ -10,7 +10,7 @@ commented out
 
 # R Shiny Workshop
 
-![alt text](https://github.com/WHOIGit/Rshinypresentation/images/bluelogo.jpg "Logo Title Text 1")
+(https://github.com/WHOIGit/Rshinypresentation/raw/master/images/bluelogo.jpg)
 
 Learn to advance yourself in informatics and solve the replication problem for generating figures. This repository contains the source code for the June 2018 Lunch-n-Learn workshop brought to you by the WHOI Information Services Application Development group.
 
