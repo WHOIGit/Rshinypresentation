@@ -85,7 +85,7 @@ To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authorin
 
 
 ## Example - Code {.smaller}
-```{r, echo = FALSE, fig.width=8}
+```
  ui<-fluidPage( 
 numericInput(inputId='n',
 'Samplesize',value=25)
@@ -167,27 +167,8 @@ common HTML tag
 
 <img src="images/tags.jpg">
 
-## HTML tags  {.smaller}
+## HTML tags
 ```
- ui<-fluidPage( 
-tags$h1("This is an example app"),
-tags$hr(),
-tags$br(),
-tags$p(strong("Tyrone Lee")),
-tags$p(em("Data Analyst and R guru")),
-tags$a(href="https://whoi.whoi-it.edu","whoi"))
-
- server<-function(input,
-output){
-output$hist<-renderPlot({
-hist(rnorm(input$n))
-})}
-
-shinyApp(ui=ui,server=server)
-```
-
-## HTML tags  
-```{r, echo = FALSE}
  ui<-fluidPage( 
 tags$h1("This is an example app"),
 tags$hr(),
@@ -264,7 +245,7 @@ box plots into one figure. Different slider inputs need to be used for choosing 
 own subset of data.
 
 ## App4
-```{r, echo=FALSE}
+```
 
 library(ggplot2)
 library(gridExtra)
