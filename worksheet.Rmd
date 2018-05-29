@@ -100,7 +100,7 @@ hist(rnorm(input$n))
 shinyApp(ui=ui,server=server)
 ```
 ## Example - Result {.smaller}
-```{r, echo = TRUE, fig.width=8}
+```{r, echo = FALSE}
  ui<-fluidPage( 
 numericInput(inputId='n',
 'Samplesize',value=25)
