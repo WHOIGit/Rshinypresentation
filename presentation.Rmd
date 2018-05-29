@@ -27,31 +27,31 @@ To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authorin
 4. Apps in the area of biostatistics & data science
 5. References, citation and boring stuff so i wont get blamed for anything
 
-## What usually happens
+## What usually happens in informatics
 
 1. Data preparation
 2. Modeling
 3. Generate report
-4. Something wrong in your data or code
+4. Something wrong in your data prep or model
 5. Repeat 1 ~ 4
 
 ## The Problem
 
 - Biostatisticians use R for their analysis
 
-- Biologists want to see the analysis without having to know R beforehand
+- Biologists want to see the analysis without having to know R issues beforehand
 
 - Biostatistician converts their data into a static format that is presentable
 - If something goes wrong, or if additional questions arise, Biostatistician has to repeat the code over
 - Biologist tries to use R code without the experience, runs into issues
 - Biostatistician uses unfamillar code, runs into issues
 
-## The Solution
+## The Motivation
 
 - Create an interface straight from R code. 
 - Be able to generate plots and figures instantaneously
 
-## The thing im 'selling'today
+## The Solution
 - R Shiny = R + interactivity + web made easy
 - In words: Open source R package from Rstudio that creates interactive web applications around your R analyses and visualizations
 - No HTML/CSS/Javascript knowledge required to implement ...
@@ -84,7 +84,22 @@ To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authorin
 - Using two separate scripts, `ui.R` and `server.R` , for defining the user interface and server operations. The app can be run using the `runApp()` function, or with the “Run App” button in RStudio
 
 
-## Example {.smaller}
+## Example - Code {.smaller}
+```{r, echo = FALSE, fig.width=8}
+ ui<-fluidPage( 
+numericInput(inputId='n',
+'Samplesize',value=25)
+,plotOutput(outputId='hist'))
+
+ server<-function(input,
+output){
+output$hist<-renderPlot({
+hist(rnorm(input$n))
+})}
+
+shinyApp(ui=ui,server=server)
+```
+## Example - Result {.smaller}
 ```{r, echo = TRUE, fig.width=8}
  ui<-fluidPage( 
 numericInput(inputId='n',
