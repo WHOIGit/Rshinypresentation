@@ -13,12 +13,6 @@ runtime: shiny
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Shiny Presentation
-
-This R Markdown presentation is made interactive using Shiny. The viewers of the presentation can change the assumptions underlying what's presented and see the results immediately. 
-
-To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
-
 ## Outline
 
 1. Introductory material
@@ -82,44 +76,13 @@ To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authorin
 - Using two separate scripts, `ui.R` and `server.R` , for defining the user interface and server operations. The app can be run using the `runApp()` function, or with the “Run App” button in RStudio
 
 
-## Example - Code {.smaller}
-```{r, echo = FALSE, fig.width=8}
- ui<-fluidPage( 
-numericInput(inputId='n',
-'Samplesize',value=25)
-,plotOutput(outputId='hist'))
+## Shiny basics 
 
- server<-function(input,
-output){
-output$hist<-renderPlot({
-hist(rnorm(input$n))
-})}
-
-shinyApp(ui=ui,server=server)
-```
-## Example - Result {.smaller}
-```{r, echo = TRUE, fig.width=8}
- ui<-fluidPage( 
-numericInput(inputId='n',
-'Samplesize',value=25)
-,plotOutput(outputId='hist'))
-
- server<-function(input,
-output){
-output$hist<-renderPlot({
-hist(rnorm(input$n))
-})}
-
-shinyApp(ui=ui,server=server)
-```
+!(./img/shiny-runapp.png)
 
 ## The User Interface (UI)
-<div class="columns-2">
-- Designing the layout of the app
-- Defining the Input variables
-- Displaying the Output from the server
 
-<img src="images/uilayout.jpg" height="160">
+<img src="img/shiny-runapp.png" height="160">
 
 </div>
 
