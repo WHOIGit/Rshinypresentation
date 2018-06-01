@@ -28,7 +28,7 @@
 Before coming to this talk you would need a laptop and a fresh installation of R and Rstudio
 
 
-[R base](https://cran.r-project.org/src/base/R-3/R-3.4.4.tar.gz)
+[R base](http://mirrors.nics.utk.edu/cran/)
 
 
 [RStudio](https://www.rstudio.com/products/rstudio/download/#download)
