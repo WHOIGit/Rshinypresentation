@@ -89,8 +89,6 @@ Click the *Run App* button, and now your app should run. You won't see much beca
 
 Click the stop button to stop the app, or press the *Escape* key.
 
-[![Shiny Stop App](./img/shiny-stopapp.png)](./img/shiny-stopapp.png)
-
 You may have noticed that when you click the *Run App* button, all it's doing is just running the function `shiny::runApp()` in the console. You can run that command instead of clicking the button if you prefer.
 
 **Exercise:** Try running the empty app using the `runApp()` function instead of using the *Run App* button.
