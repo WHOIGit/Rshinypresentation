@@ -970,7 +970,7 @@ shinyApp(ui = ui, server = server)
 
 If you do want to add some JavaScript or use common JavaScript functions in your apps, you might want to check out [shinyjs](https://github.com/daattali/shinyjs).
 
-# 15. Awesome add-on packages to Shiny
+# 15. Add-on packages to Shiny
 
 Many people have written packages that enhance Shiny in some way or add extra functionality.  Here is a list of several popular packages that people often use together with Shiny:
 
@@ -990,14 +990,11 @@ Shiny is a very popular package and has lots of resources on the web. Here's a c
 - [Shiny in Rmarkdown](http://rmarkdown.rstudio.com/authoring_shiny.html)
 - Get help from the [Shiny Google group](https://groups.google.com/forum/#!forum/shiny-discuss) or [StackOverflow](http://stackoverflow.com/questions/tagged/shiny)
 - [Publish your apps for free with shinyapps.io](http://www.shinyapps.io)
-- [Host your app on your own Shiny server](http://deanattali.com/2015/05/09/setup-rstudio-shiny-server-digital-ocean)
 - [Learn about how reactivity works](http://shiny.rstudio.com/articles/understanding-reactivity.html)
 - [Learn about useful debugging techniques](http://shiny.rstudio.com/articles/debugging.html)
 - [Shiny tips & tricks for improving your apps and solving common problems](http://deanattali.com/blog/advanced-shiny-tips)
 
 # 17. Ideas to improve our app
-
-The app we developed is functional, but there are plenty of improvements that can be made. You can compare the app we developed to [my version of this app](http://daattali.com/shiny/bcl/) to get an idea of what a (slightly) more functional app could include. Here are some suggestions of varying difficulties. Each idea also has a hint, I would recommend only reading the hint if you're stuck for 10 minutes. 
 
 - Split the app into two separate files: `ui.R` and `server.R`.
     - **Hint:** All the code assigned into the `ui` variable goes into `ui.R` and all the code for the `server` function goes into `server.R`. You do not need to explicitly call the `shinyApp()` function.
@@ -1015,36 +1012,6 @@ The app we developed is functional, but there are plenty of improvements that ca
     - **Hint:** Install the `DT` package, replace `tableOutput()` with `DT::dataTableOutput()` and replace `renderTable()` with `DT::renderDataTable()`.
 
 
-
 - Add parameters to the plot.
     - **Hint:** You will need to add input functions that will be used as parameters for the plot. You could use `shinyjs::colourInput()` to let the user decide on the colours of the bars in the plot.
 
-- The app currently behaves strangely when the user selects filters that return 0 results. For example, try searching for wines from Belgium. There will be an empty plot and empty table generated, and there will be a warning message in the R console. Try to figure out why this warning message is appearing, and how to fix it.
-    - **Hint:** The problem happens because `renderPlot()` and `renderTable()` are trying to render an empty dataframe. To fix this issue, the `filtered` reactive expression should check for the number of rows in the filtered data, and if that number is 0 then return `NULL` instead of a 0-row dataframe.
-
-- Place the plot and the table in separate tabs.
-    - **Hint:** Use `tabsetPanel()` to create an interface with multiple tabs.
-
-- If you know CSS, add CSS to make your app look nicer. 
-    - **Hint:** Add a CSS file under `www` and use the function `includeCSS()` to use it in your app.
-
-- Experiment with packages that add extra features to Shiny, such as `shinyjs`, `leaflet`, `shinydashboard`, `shinythemes`, `ggvis`.
-    - **Hint:** Each package is unique and has a different purpose, so you need to read the documentation of each package in order to know what it provides and how to use it.
-    
-- Show the number of results found whenever the filters change. For example, when searching for Italian wines $20-$40, the app would show the text "We found 122 options for you".
-    - **Hint:** Add a `textOutput()` to the UI, and in its corresponding `renderText()` use the number of rows in the `filtered()` object.
-
-- Allow the user to download the results table as a .csv file.
-    - **Hint:** Look into the `downloadButton()` and `downloadHandler()` functions.
-    
-- When the user wants to see only wines, show a new input that allows the user to filter by sweetness level. Only show this input if wines are selected.
-    - **Hint:** Create a new input function for the sweetness level, and use it in the server code that filters the data. Use `conditionalPanel()` to conditionally show this new input. The `condition` argument of `conditionalPanel` should be something like `input.typeInput == "WINE"`.
-
-- Allow the user to search for multiple alcohol types simultaneously, instead of being able to choose only wines/beers/etc.
-    - **Hint:** There are two approaches to do this. Either change the `typeInput` radio buttons into checkboxes (`checkboxGroupInput()`) since checkboxes support choosing multiple items, or change `typeInput` into a select box (`selectInput()`) with the argument `multiple = TRUE` to support choosing multiple options.
-    
-- If you look at the dataset, you'll see that each product has a "type" (beer, wine, spirit, or refreshment) and also a "subtype" (red wine, rum, cider, etc.). Add an input for "subtype" that will let the user filter for only a specific subtype of products. Since each type has different subtype options, the choices for subtype should get re-generated every time a new type is chosen. For example, if "wine" is selected, then the subtypes available should be white wine, red wine, etc.
-    - **Hint:** Use `uiOutput()` to create this input in the server code.
-    
-- Provide a way for the user to show results from *all* countries (instead of forcing a filter by only one specific country).
-    - **Hint:** There are two ways to approach this. You can either add a value of "All" to the dropdown list of country options, you can include a checkbox for "Filter by country" and only show the dropdown 
