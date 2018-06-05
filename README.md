@@ -18,7 +18,7 @@ Learn to advance yourself in informatics and solve the replication problem for g
 <a href = "http://shiny.rstudio.com/" target = "_blank">Shiny </a> is a UI framework from the folks at RStudio for the development of responsive, R-powered web applications. The code generates web interfaces that runs R code, but no knowlege of web-related code is needed; its pure R.
 
 
-The aim of this workshop is to take you step-by-step through the construction of a reasonably full-featured app. Each step will add features to the app. All you need to do is follow along the <a href = "https://github.com/WHOIGit/Rshinypresentation/blob/master/worksheet.md" target = "_blank">worksheet </a> and copying the code from there into your Rstudio console. I will cover as many steps as possible through the class as time allows, any steps or exercises I did not cover can be done on your own time, the source code will be avaliable here.
+The aim of this workshop is to take you step-by-step through the construction of a reasonably full-featured app. Each step will add features to the app. All you need to do is follow along the <a href = "https://github.com/WHOIGit/Rshinypresentation/blob/master/worksheet.md" target = "_blank">worksheet </a>  while copying the code from there into your Rstudio console. I will cover as many steps as possible through the class as time allows, any steps or exercises I did not cover can be done on your own time, the source code will be avaliable here.
  
  
 ## Prerequistes
