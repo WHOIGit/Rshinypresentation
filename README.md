@@ -9,8 +9,7 @@ commented out
 ---
 
 # R Shiny Workshop
-
-(https://github.com/WHOIGit/Rshinypresentation/raw/master/images/bluelogo.jpg)
+<img src="https://github.com/WHOIGit/Rshinypresentation/raw/master/images/bluelogo.jpg" alt="theLogo!" width="200px"/>
 
 Learn to advance yourself in informatics and solve the replication problem for generating figures. This repository contains the source code for the June 2018 Lunch-n-Learn workshop brought to you by the WHOI Information Services Application Development group.
 
