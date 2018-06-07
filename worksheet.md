@@ -19,8 +19,7 @@
 11. [Using uiOutput() to create UI elements dynamically](#using-uioutput-to-create-ui-elements-dynamically)
 12. [Final Shiny app code](#final-shiny-app-code)
 13. [Share your app with the world](#share-your-app-with-the-world)
-14. [Resources](#resources)
-15. [Credits and References](#credits)
+14. [References & Resources](#references-&-resources)
 
 
 ## 1. Before we begin
@@ -105,15 +104,15 @@ You can also create a new Shiny app using RStudio's menu by selecting *File > Ne
 
 # 4. Load the dataset
 
-The dataset we'll be using contains information about all the products sold by BC Liquor Store and is provided by [OpenDataBC](https://www.opendatabc.ca/dataset/bc-liquor-store-product-price-list-current-prices). They provide a direct link to download a *csv* version of the data, and this data has the rare quality that it is immediately clean and useful. You can view the [raw data](http://pub.data.gov.bc.ca/datasets/176284/BC_Liquor_Store_Product_Price_List.csv) they provide, but I have taken a few steps to simplify the dataset to make it more useful for our app. I removed some columns, renamed other columns, and dropped a few rare factor levels.
+The dataset we'll be using is an adaptation of the [Lake Erie Fish Community Data Explorer](https://lebs.shinyapps.io/western-basin/). They provide a direct link to download a *csv* version of the data, and this data has the rare quality that it is immediately clean and useful. You can view the [raw data](http://pub.data.gov.bc.ca/datasets/176284/BC_Liquor_Store_Product_Price_List.csv) they provide.
 
-The processed dataset we'll be using in this app is available [here](http://github.io/bcl-data.csv). Download it now and place this file in the same folder as your Shiny app. Make sure the file is named `bcl-data.csv`.
+The actual file we'll be using is a compiled list of the length of fish surveyed that was filtered and processed by Taylor Stewart who has provided the file [here](https://github.com/taylorstewart/lebs-western-basin-app/blob/master/data/WB_ExpandedLengths.csv). Download it now and place this file in the same folder as your Shiny app. Make sure the file is named `WB_ExpandedLengths.csv`.
 
-Add a line in your app to load the data into a variable called `bcl`. It should look something like this
+Add a line in your app to load the data into a variable called `fish-len`. It should look something like this
 
 
 ```r
-bcl <- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+ fish-len<- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
 ```
 
 Place this line in your app as the second line, just after `library(shiny)`.  Make sure the file path and file name are correct, otherwise your app won't run. Try to run the app to make sure the file can be loaded without errors.
@@ -845,144 +844,7 @@ After a successful deployment to shinyapps.io, you will be redirected to your ap
 
 The other option for hosting your app is on your own private [Shiny server](https://www.rstudio.com/products/shiny/shiny-server/). Shiny Server is also a product by RStudio that lets you host apps on your own server. This means that instead of RStudio hosting the app for you, you have it on your own private server. This means you have a lot more freedom, flexibility, and security for your data but it also means you need to have a server and be comfortable administering a server. Information Services (IS) might be able to help.
 
-# 14. More Shiny features to check out
-
-Shiny is extremely powerful and has lots of features that we haven't covered. Here's a sneak peek of just a few other common Shiny features that are not too advanced. 
-
-## 14.1 Shiny in Rmarkdown
-
-You can include Shiny inputs and outputs in an Rmarkdown document! This means that your Rmakdown document can be interactive. Learn more [here](http://rmarkdown.rstudio.com/authoring_shiny.html). Here's a simple example of how to include interactive Shiny elements in an Rmarkdown.
-
-~~~
----
-output: html_document
-runtime: shiny
----
-
-```{r echo=FALSE}
-sliderInput("num", "Choose a number",
-            0, 100, 20)
-
-renderPlot({
-    plot(seq(input$num))
-})
-```
-~~~
-
-
-
-## 14.2 Use conditionalPanel() to conditionally show UI elements
-
-You can use `conditionalPanel()` to either show or hide a UI element based on a simple condition, such as the value of another input. Learn more with `?conditionalPanel`.
-
-
-```r
-library(shiny)
-ui <- fluidPage(
-  numericInput("num", "Number", 5, 1, 10),
-  conditionalPanel(
-    "input.num >=5",
-    "Hello!"
-  )
-)
-server <- function(input, output) {}
-shinyApp(ui = ui, server = server)
-```
-
-## 14.3 Use navbarPage() or tabsetPanel() to have multiple tabs in the UI
-
-If your apps requires more than a single "view", you can have separate tabs. Learn more with `?navbarPage` or `?tabsetPanel`.
-
-
-```r
-library(shiny)
-ui <- fluidPage(
-  tabsetPanel(
-    tabPanel("Tab 1", "Hello"),
-    tabPanel("Tab 2", "there!")
-  )
-)
-server <- function(input, output) {}
-shinyApp(ui = ui, server = server)
-```
-
-## 14.4 Use DT for beautiful, interactive tables
-
-Whenever you use `tableOutput()` + `renderTable()`, the table that Shiny creates is a static and boring-looking table. If you download the `DT` package, you can replace the default table with a much sleeker table by just using `DT::dataTableOutput()` + `DT::renderDataTable()`. It's worth trying. Learn more on [DT's website](https://rstudio.github.io/DT/).
-
-## 14.5 Use isolate() function to remove a dependency on a reactive variable
-
-When you have multiple reactive variables inside a reactive context, the whole code block will get re-executed whenever *any* of the reactive variables change because all the variables become dependencies of the code. If you want to suppress this behaviour and cause a reactive variable to not be a dependency, you can wrap the code that uses that variable inside the `isolate()` function.  Any reactive variables that are inside `isolate()` will not result in the code re-executing when their value is changed. Read more about this behaviour with `?isolate`.
-
-## 14.6 Use update*Input() functions to update input values programmatically
-
-Any input function has an equivalent `update*Input` function that can be used to update any of its parameters.
-
-```r
-library(shiny)
-ui <- fluidPage(
-  sliderInput("slider", "Move me", value = 5, 1, 10),
-  numericInput("num", "Number", value = 5, 1, 10)
-)
-server <- function(input, output, session) {
-  observe({
-    updateNumericInput(session, "num", value = input$slider)
-  })
-}
-shinyApp(ui = ui, server = server)
-```
-
-Note that we used an additional argument `session` when defining the `server` function. While the `input` and `output` arguments are mandatory, the `session` argument is optional. You need to define the `session` argument when you want to use functions that need to access the session. The `session` parameter actually has some useful information in it, you can learn more about it with `?shiny::session`.
-
-## 14.7 Scoping rules in Shiny apps
-
-Scoping is very important to understand in Shiny once you want to support more than one user at a time. Since your app can be hosted online, multiple users can use your app simultaneously. If there are any variables (such as datasets or global parameters) that should be shared by all users, then you can safely define them globally. But any variable that should be specific to each user's session should be not be defined globally.
-
-You can think of the `server` function as a sandbox for each user. Any code outside of the server function is run once and is shared by all the instances of your Shiny app. Any code inside the server is run once *for every user that visits your app*. This means that any user-specific variables should be defined inside server. If you look at the code in our BC Liquor Store app, you'll see that we followed this rule: the raw dataset was loaded outside the server and is therefore available to all users, but the `filtered` object is constructed inside the server so that every user has their own version of it.  If `filtered` was a global variable, then when one user changes the values in your app, all other users connected to your app would see the change happen.
-
-You can learn more about the scoping rules in Shiny [here](http://shiny.rstudio.com/articles/scoping.html).
-
-## 14.8 Use global.R to define objects available to both ui.R and server.R
-
-If there are objects that you want to have available to both `ui.R` and `server.R`, you can place them in `global.R`. You can learn more about `global.R` and other scoping rules [here](http://shiny.rstudio.com/articles/scoping.html). 
-
-## 14.9 Add images 
-
-You can add an image to your Shiny app by placing an image under the "www/" folder and using the UI function `img(src = "image.png")`. Shiny will know to automatically look in the "www/" folder for the image.
-
-## 14.10 Add JavaScript/CSS
-
-If you know JavaScript or CSS you are more than welcome to use some in your app.
-
-
-```r
-library(shiny)
-ui <- fluidPage(
-  tags$head(tags$script("alert('Hello!');")),
-  tags$head(tags$style("body{ color: blue; }")),
-  "Hello"
-)
-server <- function(input, output) {
-  
-}
-shinyApp(ui = ui, server = server)
-```
-
-If you do want to add some JavaScript or use common JavaScript functions in your apps, you might want to check out [shinyjs](https://github.com/daattali/shinyjs).
-
-# 15. Add-on packages to Shiny
-
-Many people have written packages that enhance Shiny in some way or add extra functionality.  Here is a list of several popular packages that people often use together with Shiny:
-
-- [shinyjs](https://github.com/daattali/shinyjs): Easily improve the user interaction and user experience in your Shiny apps in seconds
-- [shinythemes](http://rstudio.github.io/shinythemes/): Easily alter the appearance of your app
-- [leaflet](http://rstudio.github.io/leaflet/): Add interactive maps to your apps
-- [ggvis](http://ggvis.rstudio.com/): Similar to ggplot2, but the plots are focused on being web-based and are more interactive
-- [shinydashboard](https://rstudio.github.io/shinydashboard/): Gives you tools to create visual “dashboards”
-
-# 16. Resources
-
-Shiny is a very popular package and has lots of resources on the web. Here's a compiled list of a few resources I recommend, which are all fairly easy to read and understand.
+# 14. References & Resources
 
 - [Shiny official tutorial](http://shiny.rstudio.com/tutorial)
 - [Shiny cheatsheet](http://shiny.rstudio.com/images/shiny-cheatsheet.pdf)
@@ -992,17 +854,27 @@ Shiny is a very popular package and has lots of resources on the web. Here's a c
 - [Publish your apps for free with shinyapps.io](http://www.shinyapps.io)
 - [Learn about how reactivity works](http://shiny.rstudio.com/articles/understanding-reactivity.html)
 - [Learn about useful debugging techniques](http://shiny.rstudio.com/articles/debugging.html)
-- [Shiny tips & tricks for improving your apps and solving common problems](http://deanattali.com/blog/advanced-shiny-tips)
+- [Source page for Lake Erie Community data explorer app](https://github.com/taylorstewart/lebs-western-basin-app)
+- Lake Erie Fish Community Data Explorer app. Written by Taylor R. Stewart (taylor.stewart@uvm.edu). U.S. Geological Survey, Great Lakes Science Center, Lake Erie Biological Station, Sandusky, Ohio.
+- [Source data for Lake Erie fish community](https://www.sciencebase.gov/catalog/item/56951c63e4b039675d005ed9)
+- Stewart, T.R., 2016, Lake Erie Fish Community Data, 2013-2015: U.S. Geological Survey data release, https://doi.org/10.5066/F79C6VHJ. 
+# 14.1. Ideas to improve the app
 
-# 17. Ideas to improve our app
+Here are some additional ideas to explore
 
 - Split the app into two separate files: `ui.R` and `server.R`.
     - **Hint:** All the code assigned into the `ui` variable goes into `ui.R` and all the code for the `server` function goes into `server.R`. You do not need to explicitly call the `shinyApp()` function.
     
-- Add an option to sort the results table by price.
+- Add an option to sort the results table by season.
     - **Hint:** Use `checkboxInput()` to get TRUE/FALSE values from the user.
 
-- Add an image of the BC Liquor Store to the UI.
+- Add labels and captions to the plot
+    - **Hint:** Read the docs for ggplot and ggvis
+
+- Add a Bin length slider. The default value is set to `30` in the histogram, but try to give the user a way to change that.
+    - **Hint:** Add a slider for width that dynamically adds the value to the ggplot function `layer_histograms(width = input$binwidth)`.
+
+- Add an image to the UI. Perhaps the WHOI or USGS logo.
     - **Hint:** Place the image in a folder named `www`, and use `img(src = "imagename.png")` to add the image.
 
 - Share your app with everyone on the internet by deploying to shinyapps.io.
@@ -1010,7 +882,6 @@ Shiny is a very popular package and has lots of resources on the web. Here's a c
 
 - Use the `DT` package to turn the current results table into an interactive table.
     - **Hint:** Install the `DT` package, replace `tableOutput()` with `DT::dataTableOutput()` and replace `renderTable()` with `DT::renderDataTable()`.
-
 
 - Add parameters to the plot.
     - **Hint:** You will need to add input functions that will be used as parameters for the plot. You could use `shinyjs::colourInput()` to let the user decide on the colours of the bars in the plot.
