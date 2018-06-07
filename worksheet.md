@@ -6,7 +6,7 @@
 
 ## Table of contents
 
-1. [Before we begin](#before-we-begin)
+1. [Prerequisites](#prerequisites)
 2. [How to Use this Document](#shiny-app-basics)
 3. [Create an empty Shiny app](#create-an-empty-shiny-app)
 4. [Load the dataset](#load-the-dataset)
@@ -22,7 +22,7 @@
 14. [References & Resources](#references-&-resources)
 
 
-## 1. Before we begin
+## 1. Prerequisites
 
 Before coming to this talk you would need a laptop and a fresh installation of R and Rstudio
 
