@@ -38,6 +38,14 @@ Once installed, open R studio and install the `shiny` package.
 ```r
 install.packages("shiny")
 ```
+If you are on windows and having issues, there is a known bug in the latest version. Instead, try installing an earlier version of `shiny`.
+
+```r
+install.packages("devtools")
+require(devtools)
+install_version("shiny", version = "1.0.5", repos = "http://cran.us.r-project.org")
+
+```
 
 To ensure you successfully installed Shiny, try running one of the demo apps.
 
@@ -104,15 +112,15 @@ You can also create a new Shiny app using RStudio's menu by selecting *File > Ne
 
 # 4. Load the dataset
 
-The dataset we'll be using is an adaptation of the [Lake Erie Fish Community Data Explorer](https://lebs.shinyapps.io/western-basin/). They provide a direct link to download a *csv* version of the data, and this data has the rare quality that it is immediately clean and useful. You can view the [raw data](http://pub.data.gov.bc.ca/datasets/176284/BC_Liquor_Store_Product_Price_List.csv) they provide.
+The dataset we'll be using is an adaptation of the [Lake Erie Fish Community Data Explorer](https://lebs.shinyapps.io/western-basin/). They provide a direct link to download a *csv* version of the data for their app, and this data has the rare quality that it is immediately clean and useful. You can view the [raw data](https://www.sciencebase.gov/catalog/item/588a3380e4b0ba3b075e8376) they provide.
 
-The actual file we'll be using is a compiled list of the length of fish surveyed that was filtered and processed by Taylor Stewart who has provided the file [here](https://github.com/taylorstewart/lebs-western-basin-app/blob/master/data/WB_ExpandedLengths.csv). Download it now and place this file in the same folder as your Shiny app. Make sure the file is named `WB_ExpandedLengths.csv`.
+The actual file we'll be using is a filtered and processed list of the length of fish surveyed from 2013-2016. The work was done by Taylor Stewart at University of Vermont who has provided the file [here](https://github.com/taylorstewart/lebs-western-basin-app/blob/master/data/WB_ExpandedLengths.csv). Download it now and place this file in the same folder as your Shiny app. Make sure the file is named `WB_ExpandedLengths.csv`.
 
-Add a line in your app to load the data into a variable called `fish-len`. It should look something like this
+Add a line in your app to load the data into a variable called `fish_len`. It should look something like this
 
 
 ```r
- fish-len<- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+ fish_len<- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 ```
 
 Place this line in your app as the second line, just after `library(shiny)`.  Make sure the file path and file name are correct, otherwise your app won't run. Try to run the app to make sure the file can be loaded without errors.
@@ -121,12 +129,12 @@ If you want to verify that the app can successfully read the data, you can add a
 
 
 ```r
-print(str(bcl))
+print(str(fish_len))
 ```
 
 Once you get confirmation that the data is properly loaded, you can remove that line.
 
-**Exercise:** Load the data file into R and get a feel for what's in it. How big is it, what variables are there, what are the normal price ranges, etc.
+**Exercise:** Load the data file into R and get a feel for what's in it. Look at the enviroment tab and click on the data object you loaded in this step.
 
 # 5. Build the basic UI
 
@@ -138,7 +146,7 @@ You can place R strings inside `fluidPage()` to render text.
 
 
 ```r
-fluidPage("BC Liquor Store", "prices")
+fluidPage("Fish caught in Lake Erie", "Length")
 ```
 
 Replace the line in your app that assigns an empty `fluidPage()` into `ui` with the one above, and run the app.
@@ -161,11 +169,11 @@ Just as a demonstration, try replacing the `fluidPage()` function in your UI wit
 ```r
 fluidPage(
   h1("My app"),
-  "BC",
-  "Liquor",
+  "Walleye",
+  "Lake Erie",
   br(),
-  "Store",
-  strong("prices")
+  "Quillback",
+  strong("Bigmouth Bass")
 )
 ```
 
@@ -184,7 +192,7 @@ Overwrite the `fluidPage()` that you experimented with so far, and replace it wi
 
 ```r
 fluidPage(
-  titlePanel("BC Liquor Store prices")
+  titlePanel("Total Length of fishes, 2013 -2016")
 )
 ```
 
@@ -211,10 +219,10 @@ So far our complete app looks like this (hopefully this isn't a surprise to you)
 
 ```r
 library(shiny)
-bcl <- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
-  titlePanel("BC Liquor Store prices"),
+  titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
     sidebarPanel("our inputs will go here"),
     mainPanel("the results will go here")
@@ -268,33 +276,32 @@ All input functions have the same first two arguments: `inputId` and `label`. Th
 
 ## 6.1 Input for price
 
-The first input we want to have is for specifying a price range (minimum and maximum price). The most sensible types of input for this are either `numericInput()` or `sliderInput()` since they are both used for selecting numbers. If we use `numericInput()`, we'd have to use two inputs, one for the minimum value and one for the maximum. Looking at the documentation for `sliderInput()`, you'll see that by supplying a vector of length two as the `value` argument, it can be used to specify a range rather than a single number. This sounds like what we want in this case, so we'll use `sliderInput()`. 
+The first input we want to have is for specifying a range of lengths (minimum and maximum millimeter amounts). The most sensible types of input for this are either `numericInput()` or `sliderInput()` since they are both used for selecting numbers. If we use `numericInput()`, we'd have to use two inputs, one for the minimum value and one for the maximum. Looking at the documentation for `sliderInput()`, you'll see that by supplying a vector of length two as the `value` argument, it can be used to specify a range rather than a single number. This sounds like what we want in this case, so we'll use `sliderInput()`. 
 
-To create a slider input, a maximum value needs to be provided. We could use the maximum price in the dataset, which is $30,250, but I doubt I'd ever buy something that expensive with what WHOI pays me. I think $100 is a more reasonable max price for me, and about 85% of the products in this dataset are below $100, so let's use that as our max.
+To create a slider input, a maximum value needs to be provided. We could use the maximum value in the dataset, which is 1.5 meters. That sounds like quite the fish story so lets instead use 60cm. About 85% of the individuals measured in this dataset are below that.
 
 By looking at the documentation for the slider input function, the following piece of code can be constructed.
 
 
 ```r
-sliderInput("priceInput", "Price", min = 0, max = 100,
-            value = c(25, 40), pre = "$")
+sliderInput("lengthInput", "Length", 0, 800, c(5, 600))
 ```
 
 Place the code for the slider input inside `sidebarPanel()` (replace the text we wrote earlier with this input).
 
 **Exercise:** Run the code of the `sliderInput()` in the R console and see what it returns. Change some of the parameters of `sliderInput()`, and see how that changes the result.  It's important to truly understand that all these functions in the UI are simply a convenient way to write HTML, as is apparent whenever you run these functions on their own. You could write your own HTML functions for even greater.
 
-## 6.2 Input for product type
+## 6.2 Input for static categories
 
-Usually when going to the liquor store you know whether you're looking for beer or wine, and you don't want to waste your time in the wrong section.  The same is true in our app, we should be able to choose what type of product we want.
+Now we want to create an input for selecting which species we want to look at.
 
-For this we want some kind of a text input. But allowing the user to enter text freely isn't the right solution because we want to restrict the user to only a few choices.  We could either use radio buttons or a select box for our purpose. Let's use radio buttons for now since there are only a few options, so take a look at the documentation for `radioButtons()` and come up with a reasonable input function code.  It should look like this:
+For this we want some kind of a text input. But allowing the user to enter text freely isn't the right solution because we want to restrict the user to only a few choices, namely fish species found in the survey.  We could either use radio buttons or a select box for our purpose. Let's use radio buttons for now since there are only a few options, so take a look at the documentation for `radioButtons()` and come up with a reasonable input function code.  It should look like this:
 
 
 ```r
-radioButtons("typeInput", "Product type",
-            choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
-            selected = "WINE")
+      radioButtons("speciesInput", "Species",
+                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
+                   selected = "Walleye"
 ```
 
 Add this input code inside `sidebarPanel()`, after the previous input (separate them with a comma).
@@ -303,12 +310,12 @@ Add this input code inside `sidebarPanel()`, after the previous input (separate 
 
 ## 6.3 Input for country
 
-Sometimes I like to feel fancy and only look for wines imported from France. We should add one last input, to select a country. The most appropriate input type in this case is probably the select box. Look at the documentation for `selectInput()` and create an input function. For now let's only have CANADA, FRANCE, ITALY as options, and later we'll see how to include all countries. 
+The surveys are conducted during the fishing season in the great lakes, usually late spring or early autumn. Lets create a method for selecting the time of year. The most appropriate input type in this case is probably the select box. Look at the documentation for `selectInput()` and create an input function.
 
 
 ```r
-selectInput("countryInput", "Country",
-            choices = c("CANADA", "FRANCE", "ITALY"))
+selectInput("seasonInput", "Season",
+            choices = c("Spring","Autumn"))
 ```
 
 Add this function as well to your app.  If you followed along, your entire app should have this code:
@@ -316,19 +323,18 @@ Add this function as well to your app.  If you followed along, your entire app s
 
 ```r
 library(shiny)
-bcl <- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
-  titlePanel("BC Liquor Store prices"),
+  titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
-    sidebarPanel(
-      sliderInput("priceInput", "Price", 0, 100, c(25, 40), pre = "$"),
-      radioButtons("typeInput", "Product type",
-                  choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
-                  selected = "WINE"),
-      selectInput("countryInput", "Country",
-                  choices = c("CANADA", "FRANCE", "ITALY"))
-    ),
+    sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
+          radioButtons("speciesInput", "Species",
+                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
+                   selected = "Walleye")
+                   selectInput("seasonInput", "Season",
+            choices = c("Spring","Autumn")),
+            )
     mainPanel("the results will go here")
   )
 )
@@ -336,6 +342,7 @@ ui <- fluidPage(
 server <- function(input, output) {}
 
 shinyApp(ui = ui, server = server)
+
 ```
 
 [![Shiny add inputs](./img/shiny-addinputs.png)](./img/shiny-addinputs.png)
@@ -381,19 +388,18 @@ If you've followed along, your app should now have this code:
 
 ```r
 library(shiny)
-bcl <- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
-  titlePanel("BC Liquor Store prices"),
+  titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
-    sidebarPanel(
-      sliderInput("priceInput", "Price", 0, 100, c(25, 40), pre = "$"),
-      radioButtons("typeInput", "Product type",
-                  choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
-                  selected = "WINE"),
-      selectInput("countryInput", "Country",
-                  choices = c("CANADA", "FRANCE", "ITALY"))
-    ),
+    sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
+          radioButtons("speciesInput", "Species",
+                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
+                   selected = "Walleye")
+                   selectInput("seasonInput", "Season",
+            choices = c("Spring","Autumn")),
+            ),
     mainPanel(
       plotOutput("coolplot"),
       br(), br(),
@@ -445,15 +451,15 @@ Now we'll take the plot one step further. Instead of always plotting the same pl
 
 ```r
 output$coolplot <- renderPlot({
-  plot(rnorm(input$priceInput[1]))
+  plot(rnorm(input$lengthInput[1]))
 })
 ```
 
-Replace the previous code in your server function with this code, and run the app. Whenever you choose a new minimum price range, the plot will update with a new number of points. Notice that the only thing different in the code is that instead of using the number `100` we are using `input$priceInput[1]`. 
+Replace the previous code in your server function with this code, and run the app. Whenever you choose a new minimum price range, the plot will update with a new number of points. Notice that the only thing different in the code is that instead of using the number `100` we are using `input$lengthInput[1]`. 
 
-What does this mean? Just like the variable `output` contains a list of all the outputs (and we need to assign code into them), the variable `input` contains a list of all the inputs that are defined in the UI. `input$priceInput` return a vector of length 2 containing the miminimum and maximum price. Whenever the user manipulates the slider in the app, these values are updated, and whatever code relies on it gets re-evaluated. This is a concept known as [**reactivity**](#reactivity-101), which we will get to in a few minutes.
+What does this mean? Just like the variable `output` contains a list of all the outputs (and we need to assign code into them), the variable `input` contains a list of all the inputs that are defined in the UI. `input$lengthInput` return a vector of length 2 containing the miminimum and maximum length. Whenever the user manipulates the slider in the app, these values are updated, and whatever code relies on it gets re-evaluated. This is a concept known as [**reactivity**](#reactivity-101), which we will get to in a few minutes.
 
-Notice that these short 3 lins of code are using all the 3 rules for building outputs: we are saving to the `output` list (`output$coolplot <-`), we are using a `render*` function to build the output (`renderPlot({})`), and we are accessing an input value (`input$priceInput[1]`). 
+Notice that these short 3 lins of code are using all the 3 rules for building outputs: we are saving to the `output` list (`output$coolplot <-`), we are using a `render*` function to build the output (`renderPlot({})`), and we are accessing an input value (`input$lengthInput[1]`). 
 
 ## 9.3 Building the plot output
 
@@ -473,24 +479,24 @@ output$coolplot <- renderPlot({
 
 If you run the app with this code inside your server, you should see a histogram in the app.  But if you change the input values, nothing happens yet, so the next step is to actually filter the dataset based on the inputs.
 
-Recall that we have 3 inputs: `priceInput`, `typeInput`, and `countryInput`. We can filter the data based on the values of these three inputs. We'll use `dplyr` functions to filter the data, so be sure to include `dplyr` at the top. Then we'll plot the filtered data instead of the original data.
+Recall that we have 3 inputs: `lengthInput`, `speciesInput`, and `seasonInput`. We can filter the data based on the values of these three inputs. We'll use `dplyr` functions to filter the data, so be sure to include `dplyr` at the top. Then we'll plot the filtered data instead of the original data.
 
 
 ```r
 output$coolplot <- renderPlot({
   filtered <-
-    bcl %>%
-    filter(Price >= input$priceInput[1],
-           Price <= input$priceInput[2],
-           Type == input$typeInput,
-           Country == input$countryInput
+    fish_len %>%
+    filter(Price >= input$lengthInput[1],
+           Price <= input$lengthInput[2],
+           Species == input$speciesInput,
+           Season == input$seasonInput
     )
-  ggplot(filtered, aes(Alcohol_Content)) +
+  ggplot(filtered, aes(tl.mm)) +
     geom_histogram()
 })
 ```
 
-Place this code in your server function and run the app. If you change any input, you should see the histogram update. The way I know the histogram is correct is by noticing that the alcohol content is about 5% when I selecte beer, 40% for spirits, and 13% for wine. That sounds right.
+Place this code in your server function and run the app. If you change any input, you should see the histogram update. 
 
 Read this code and understand it. You've successfully created an interactive app - the plot is changing according to the user's selection.
 
@@ -502,18 +508,18 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 
-bcl <- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
-  titlePanel("BC Liquor Store prices"),
+  titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
     sidebarPanel(
-      sliderInput("priceInput", "Price", 0, 100, c(25, 40), pre = "$"),
-      radioButtons("typeInput", "Product type",
-                  choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
-                  selected = "WINE"),
-      selectInput("countryInput", "Country",
-                  choices = c("CANADA", "FRANCE", "ITALY"))
+      sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
+      radioButtons("speciesInput", "Species",
+                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
+                   selected = "Walleye"),
+      selectInput("seasonInput", "Season",
+                  choices = c("Spring", "Autumn"))
     ),
     mainPanel(
       plotOutput("coolplot"),
@@ -524,17 +530,17 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-  output$coolplot <- renderPlot({
-    filtered <-
-      bcl %>%
-      filter(Price >= input$priceInput[1],
-             Price <= input$priceInput[2],
-             Type == input$typeInput,
-             Country == input$countryInput
-      )
-    ggplot(filtered, aes(Alcohol_Content)) +
-      geom_histogram()
-  })
+output$coolplot <- renderPlot({
+  filtered <-
+    fish_len %>%
+    filter(Price >= input$lengthInput[1],
+           Price <= input$lengthInput[2],
+           Species == input$speciesInput,
+           Season == input$seasonInput
+    )
+  ggplot(filtered, aes(tl.mm)) +
+    geom_histogram()
+})
 }
 
 shinyApp(ui = ui, server = server)
@@ -766,21 +772,21 @@ In case you got lost somewhere, here is the final code. The app is now functiona
 
 
 ```r
-library(shiny)
-library(ggplot2)
-library(dplyr)
-
-bcl <- read.csv("bcl-data.csv", stringsAsFactors = FALSE)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
-  titlePanel("BC Liquor Store prices"),
+  titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
     sidebarPanel(
-      sliderInput("priceInput", "Price", 0, 100, c(25, 40), pre = "$"),
-      radioButtons("typeInput", "Product type",
-                  choices = c("BEER", "REFRESHMENT", "SPIRITS", "WINE"),
-                  selected = "WINE"),
-      uiOutput("countryOutput")
+      #inputs
+      #length slider
+      sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
+      #species buttons
+      radioButtons("speciesInput", "Species",
+                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
+                   selected = "Walleye"),
+      #year menu
+      uiOutput("seasonOutput")
     ),
     mainPanel(
       plotOutput("coolplot"),
@@ -791,22 +797,27 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-  output$countryOutput <- renderUI({
-    selectInput("countryInput", "Country",
-                sort(unique(bcl$Country)),
-                selected = "CANADA")
+  output$seasonOutput <- renderUI({
+    selectInput("seasonInput", "Season collected",
+                sort(unique(fish_len$season)),
+                selected = "Spring")
   })  
   
   filtered <- reactive({
-    if (is.null(input$countryInput)) {
+    if (is.null(input$seasonInput)) {
       return(NULL)
     }    
     
-    bcl %>%
-      filter(Price >= input$priceInput[1],
-             Price <= input$priceInput[2],
-             Type == input$typeInput,
-             Country == input$countryInput
+    fish_len %>%
+      filter(#max and min length
+             tl.mm >= input$lengthInput[1],
+             tl.mm <= input$lengthInput[2],
+             #species
+             species == input$speciesInput,
+             #season
+             season == input$seasonInput
+             #year
+             #year == input$yearInput
       )
   })
   
@@ -814,10 +825,10 @@ server <- function(input, output) {
     if (is.null(filtered())) {
       return()
     }
-    ggplot(filtered(), aes(Alcohol_Content)) +
+    ggplot(filtered(), aes(tl.mm)) +
       geom_histogram()
   })
-
+  
   output$results <- renderTable({
     filtered()
   })

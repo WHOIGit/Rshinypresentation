@@ -10,7 +10,7 @@ ui <- fluidPage(
     sidebarPanel(
       #inputs
       #length slider
-      sliderInput("lengthInput", "Length", 0, 1500, c(5, 800)),
+      sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
       #species buttons
       radioButtons("speciesInput", "Species",
                    choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
