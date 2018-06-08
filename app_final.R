@@ -2,10 +2,10 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 
-fish-len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
-  titlePanel("Total Length Frequency"),
+  titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
     sidebarPanel(
       #inputs
@@ -13,7 +13,7 @@ ui <- fluidPage(
       sliderInput("lengthInput", "Length", 0, 1500, c(5, 800)),
       #species buttons
       radioButtons("speciesInput", "Species",
-                   choices = c("Alewife", "Gizzard Shad", "Walleye", "Quillback"),
+                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
                    selected = "Walleye"),
       #year menu
       uiOutput("seasonOutput")
@@ -29,7 +29,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   output$seasonOutput <- renderUI({
     selectInput("seasonInput", "Season collected",
-                sort(unique(fish-len$season)),
+                sort(unique(fish_len$season)),
                 selected = "Spring")
   })  
   
@@ -38,7 +38,7 @@ server <- function(input, output) {
       return(NULL)
     }    
     
-    fish-len %>%
+    fish_len %>%
       filter(#max and min length
              tl.mm >= input$lengthInput[1],
              tl.mm <= input$lengthInput[2],
