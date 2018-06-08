@@ -252,7 +252,7 @@ print(ui)
 
 ~~~
 ## <div class="container-fluid">
-##   <h2>BC Liquor Store prices</h2>
+##   <h2>Lake Erie Community data</h2>
 ##   <div class="row">
 ##     <div class="col-sm-4">
 ##       <form class="well">our inputs will go here</form>
@@ -306,7 +306,7 @@ For this we want some kind of a text input. But allowing the user to enter text 
 
 Add this input code inside `sidebarPanel()`, after the previous input (separate them with a comma).
 
-> If you look at that input function and think "what if there were 100 types, listing them by hand would not be fun, there's got to be a better way!", then you're right.  This is where [`uiOutput()`](#using-uioutput-to-create-ui-elements-dynamically) comes in handy, but we'll talk about that later.
+> If you look at that input function and think "what if there were 100 species, listing them by hand would not be fun, there's got to be a better way!", then you're right.  This is where [`uiOutput()`](#using-uioutput-to-create-ui-elements-dynamically) comes in handy, but we'll talk about that later.
 
 ## 6.3 Input for country
 
@@ -328,6 +328,7 @@ fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 ui <- fluidPage(
   titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
+  sidebarPanel(
     sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
           radioButtons("speciesInput", "Species",
                    choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
@@ -393,19 +394,20 @@ fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 ui <- fluidPage(
   titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
+    sidebarPanel(
     sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
-          radioButtons("speciesInput", "Species",
-                   choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
-                   selected = "Walleye")
-                   selectInput("seasonInput", "Season",
-            choices = c("Spring","Autumn")),
-            ),
-    mainPanel(
-      plotOutput("coolplot"),
-      br(), br(),
-      tableOutput("results")
-    )
+    radioButtons("speciesInput", "Species",
+                 choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
+                 selected = "Walleye"),
+    selectInput("seasonInput", "Season",
+                choices = c("Spring","Autumn"))
+  ),
+  mainPanel(
+    plotOutput("coolplot"),
+    br(), br(),
+    tableOutput("results")
   )
+)
 )
 
 server <- function(input, output) {}
@@ -455,11 +457,11 @@ output$coolplot <- renderPlot({
 })
 ```
 
-Replace the previous code in your server function with this code, and run the app. Whenever you choose a new minimum price range, the plot will update with a new number of points. Notice that the only thing different in the code is that instead of using the number `100` we are using `input$lengthInput[1]`. 
+Replace the previous code in your server function with this code, and run the app. Whenever you choose a new minimum total length, the plot will update with a new number of points. Notice that the only thing different in the code is that instead of using the number `100` we are using `input$lengthInput[1]`. 
 
 What does this mean? Just like the variable `output` contains a list of all the outputs (and we need to assign code into them), the variable `input` contains a list of all the inputs that are defined in the UI. `input$lengthInput` return a vector of length 2 containing the miminimum and maximum length. Whenever the user manipulates the slider in the app, these values are updated, and whatever code relies on it gets re-evaluated. This is a concept known as [**reactivity**](#reactivity-101), which we will get to in a few minutes.
 
-Notice that these short 3 lins of code are using all the 3 rules for building outputs: we are saving to the `output` list (`output$coolplot <-`), we are using a `render*` function to build the output (`renderPlot({})`), and we are accessing an input value (`input$lengthInput[1]`). 
+Notice that these short 3 lines of code are using all the 3 rules for building outputs: we are saving to the `output` list (`output$coolplot <-`), we are using a `render*` function to build the output (`renderPlot({})`), and we are accessing an input value (`input$lengthInput[1]`). 
 
 ## 9.3 Building the plot output
 
@@ -467,12 +469,12 @@ Now we have all the knowledge required to build a plot visualizing some aspect o
 
 First we need to make sure `ggplot2` is loaded, so add a `library(ggplot2)` at the top.
 
-Next we'll return a histogram of alcohol content from `renderPlot()`. Let's start with just a histogram of the whole data, unfiltered.
+Next we'll return a histogram of total lengths from `renderPlot()`. Let's start with just a histogram of the whole data, unfiltered.
 
 
 ```r
 output$coolplot <- renderPlot({
-  ggplot(bcl, aes(Alcohol_Content)) +
+  ggplot(bcl, aes(tl.mm)) +
     geom_histogram()
 })
 ```
@@ -608,9 +610,9 @@ One very important thing to remember about reactive variables (such as the `inpu
 Operation not allowed without an active reactive context. (You tried to do something that can only be done from inside a reactive expression or observer.)
 ~~~
 
-Shiny is very clear about what the error is: we are trying to access a reactive variable outside of a reactive context. To fix this, we can use the `observe({})` function to access the `input` variable.  Inside the server, replace `print(input$priceInput)` with `observe({ print(input$priceInput) })`, and now the app should run fine. Note that this `observe({})` statement *depends* on `input$priceInput`, so whenever you change the value of the price, the code inside this `observe({})` will run again, and the new value will be printed. This is actually a very simple yet useful debugging technique in Shiny: often you want to know what value a reactive variable holds, so you need to remember to wrap the `cat(input$x)` or `print(input$x)` by an `observe({})`.
+Shiny is very clear about what the error is: we are trying to access a reactive variable outside of a reactive context. To fix this, we can use the `observe({})` function to access the `input` variable.  Inside the server, replace `print(input$lengthInput)` with `observe({ print(input$lengthInput) })`, and now the app should run fine. Note that this `observe({})` statement *depends* on `input$lengthInput`, so whenever you change the value of the length, the code inside this `observe({})` will run again, and the new value will be printed. This is actually a very simple yet useful debugging technique in Shiny: often you want to know what value a reactive variable holds, so you need to remember to wrap the `cat(input$x)` or `print(input$x)` by an `observe({})`.
 
-So far we only saw one reactive variable: the `input` list. You can also create your own reactive variables using the `reactive({})` function. The `reactive({})` function is similar to `observe({})` in that it is also a reactive context, which means that it will get re-run whenever any of the reactive variables in it get updated. The difference between them is that `reactive({})` returns a value. To see it in action, let's create a variable called `priceDiff` that will be the difference between the maximum and minimum price selected. If you try to naively define `priceDiff <- diff(input$priceInput)`, you'll see the same error as before about doing something outside a reactive context. This is because `input$priceInput` is a reactive variable, and we can't use a reactive variable outside a reactive context. Since we want to assign a value, we use the `reactive({})` function. Try adding the following line to your server:
+So far we only saw one reactive variable: the `input` list. You can also create your own reactive variables using the `reactive({})` function. The `reactive({})` function is similar to `observe({})` in that it is also a reactive context, which means that it will get re-run whenever any of the reactive variables in it get updated. The difference between them is that `reactive({})` returns a value. To see it in action, let's create a variable called `lengthDiff` that will be the difference between the maximum and minimum price selected. If you try to naively define `lengthDiff <- diff(input$lengthInput)`, you'll see the same error as before about doing something outside a reactive context. This is because `input$lengthInput` is a reactive variable, and we can't use a reactive variable outside a reactive context. Since we want to assign a value, we use the `reactive({})` function. Try adding the following line to your server:
 
 ```r
 priceDiff <- reactive({
@@ -618,9 +620,9 @@ priceDiff <- reactive({
 })
 ```
 
-Now your app will run. If you want to access a reactive variable defined with `reactive({})`, **you must add parentheses after the variable name, as if it's a function**. To demonstrate this, add `observe({ print(priceDiff()) })` to your server function. Notice that we use `priceDiff()` rather than `priceDiff`. It's very important to remember this, because you can get confusing unclear errors if you simply try to access a custom reactive variable without the parentheses.
+Now your app will run. If you want to access a reactive variable defined with `reactive({})`, **you must add parentheses after the variable name, as if it's a function**. To demonstrate this, add `observe({ print(priceDiff()) })` to your server function. Notice that we use `priceDiff()` rather than `lengthDiff`. It's very important to remember this, because you can get confusing unclear errors if you simply try to access a custom reactive variable without the parentheses.
 
-You can think of reactivity as causing a chain reaction: when one reactive value changes, anything that depends on it will get updated. If any of the updated values are themselves reactive variables, then any reactive contexts that depend on those variables will also get updated in turn. As a concrete example, let's think about what happens when you change the value of the `priceInput` on the page. Since `input$priceInput` is a reactive variable, any expression that uses it will get updated. This means the two render functions from earlier will execute because they both depend on `input$priceInput`, as well as the `priceDiff` variable because it also depends on it. But since `priceDiff` is itself a reactive variable, Shiny will check if there is anything that depends on `priceDiff`, and indeed there is - the `observe({})` function that prints tthe value of `priceDiff`. So once `priceDiff` gets updated, the `observe({})` function will run, and the value will get printed.
+You can think of reactivity as causing a chain reaction: when one reactive value changes, anything that depends on it will get updated. If any of the updated values are themselves reactive variables, then any reactive contexts that depend on those variables will also get updated in turn. As a concrete example, let's think about what happens when you change the value of the `lengthInput` on the page. Since `input$lengthInput` is a reactive variable, any expression that uses it will get updated. This means the two render functions from earlier will execute because they both depend on `input$lengthInput`, as well as the `lengthDiff` variable because it also depends on it. But since `lengthDiff` is itself a reactive variable, Shiny will check if there is anything that depends on `lengthDiff`, and indeed there is - the `observe({})` function that prints tthe value of `lengthDiff`. So once `lengthDiff` gets updated, the `observe({})` function will run, and the value will get printed.
 
 Reactivity is usually the hardest part about Shiny to understand, so if you don't quite get it, don't feel bad. Try reading this section again, and I promise that with time and experience you will get more comfortable with reactivity. Once you do feel more confident with reactivity, it may be a good idea to read more advanced documentation describing reactivity, since this section greatly simplifies ideas to make them more understandable. A great resource is RStudio's [tutorial on reactivity](http://shiny.rstudio.com/articles/understanding-reactivity.html).
 
@@ -637,11 +639,11 @@ The first step would be to create the reactive variable. The following code shou
 
 ```r
 filtered <- reactive({
-  bcl %>%
-    filter(Price >= input$priceInput[1],
-           Price <= input$priceInput[2],
-           Type == input$typeInput,
-           Country == input$countryInput
+  fish_len %>%
+    filter(tl.mm >= input$lengthInput[1],
+           tl.mm <= input$lengthInput[2],
+           species == input$speciesInput,
+           season == input$seasonInput
     )
 })
 ```
@@ -652,16 +654,16 @@ The variable `filtered` is being defined exactly like before, except the body is
 ```r
 server <- function(input, output) {
   filtered <- reactive({
-    bcl %>%
-      filter(Price >= input$priceInput[1],
-             Price <= input$priceInput[2],
-             Type == input$typeInput,
-             Country == input$countryInput
+    fish_len %>%
+     filter(tl.mm >= input$lengthInput[1],
+            tl.mm <= input$lengthInput[2],
+            species == input$speciesInput,
+            season == input$seasonInput
       )
   })
   
   output$coolplot <- renderPlot({
-    ggplot(filtered(), aes(Alcohol_Content)) +
+    ggplot(filtered(), aes(tl.mm)) +
       geom_histogram()
   })
 
@@ -705,23 +707,23 @@ If you run that tiny app, you will see that whenever you change the value of the
 
 ## 11.2 Use uiOutput() in our app to populate the countries
 
-We can use this concept in our app to populate the choices for the country selector. The country selector currently only holds 3 values that we manually entered, but instead we could render the country selector in the server and use the data to determine what countries it can have. 
+We can use this concept in our app to populate the choices for the Season selector. The season selector currently only holds 2 values that we manually entered, but instead we could render the country selector in the server and use the data to determine what season it can have. 
 
-First we need to replace the `selectInput("countryInput", ...)` in the UI with 
+First we need to replace the `selectInput("seasonInput", ...)` in the UI with 
 
 
 ```r
-uiOutput("countryOutput")
+uiOutput("seasonOutput")
 ```
 
 Then we need to create the output (which will create a UI element - yeah, it can be a bit confusing at first), so add the following code to the server function:
 
 
 ```r
-output$countryOutput <- renderUI({
-  selectInput("countryInput", "Country",
-              sort(unique(bcl$Country)),
-              selected = "CANADA")
+  output$seasonOutput <- renderUI({
+    selectInput("seasonInput", "Season collected",
+                sort(unique(fish_len$season)),
+                selected = "Spring")
 })
 ```
 
@@ -736,15 +738,15 @@ Once we understand why the error is happening, fixing it is simple. Inside the `
 
 ```r
 filtered <- reactive({
-  if (is.null(input$countryInput)) {
+  if (is.null(input$seasonInput)) {
     return(NULL)
   }    
   
-  bcl %>%
-    filter(Price >= input$priceInput[1],
-           Price <= input$priceInput[2],
-           Type == input$typeInput,
-           Country == input$countryInput
+    fish_len %>%
+     filter(tl.mm >= input$lengthInput[1],
+            tl.mm <= input$lengthInput[2],
+            species == input$speciesInput,
+            season == input$seasonInput
     )
 })
 ```
@@ -757,7 +759,7 @@ output$coolplot <- renderPlot({
   if (is.null(filtered())) {
     return()
   }
-  ggplot(filtered(), aes(Alcohol_Content)) +
+  ggplot(filtered(), aes(tl.mm)) +
     geom_histogram()
 })
 ```
