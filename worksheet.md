@@ -55,8 +55,14 @@ library(shiny)
 runExample("01_hello")
 ```
 
-If the example app is running, press *Escape* to close the app, and you are ready to build your first Shiny app!
+If the example app is running, press *Escape* to close the app. 
+We will also need some other packages to build the final resulting app in this tutorial, after verifying
+shiny works, try to install the other packages we will need.
 
+```r
+install.packages("dplyr")
+install.packages("ggplot2")
+```
 
 # 2. How to use this document
 
