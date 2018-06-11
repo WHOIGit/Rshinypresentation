@@ -7,8 +7,8 @@
 ## Table of contents
 
 1. [Prerequisites](#prerequisites)
-2. [How to Use this Document](#shiny-app-basics)
-3. [Create an empty Shiny app](#create-an-empty-shiny-app)
+2. [What is Shiny?](#what-is-shiny)
+3. [Create an empty Shiny app](#Create-an-empty-Shiny-app)
 4. [Load the dataset](#load-the-dataset)
 5. [Build the basic UI](#build-the-basic-ui)
 6. [Add inputs to the UI](#add-inputs-to-the-ui)
@@ -64,7 +64,7 @@ install.packages("dplyr")
 install.packages("ggplot2")
 ```
 
-# 2. How to use this document
+# 2. What is shiny?
 
 
 Shiny is a package from RStudio that can be used to build interactive web pages with R. While that may sound scary because of the words "web pages", it's geared to R users who have 0 experience with web development, and you do not need to know any HTML/CSS/JavaScript.
@@ -250,8 +250,6 @@ shinyApp(ui = ui, server = server)
 This was already mentioned, but it's important to remember: the enire UI is just HTML, and Shiny simply gives you easy tools to write it without having to know HTML. To convince yourself of this, look at the output when printing the contents of the `ui` variable.
 
 
-
-
 ```r
 print(ui)
 ```
@@ -280,7 +278,7 @@ All input functions have the same first two arguments: `inputId` and `label`. Th
 
 **Exercise:** Read the documentation of `?numericInput` and try adding a numeric input to the UI. Experiment with the different arguments. Run the app and see how you can interact with this input. Then try different inputs types.
 
-## 6.1 Input for price
+## 6.1 Input for length
 
 The first input we want to have is for specifying a range of lengths (minimum and maximum millimeter amounts). The most sensible types of input for this are either `numericInput()` or `sliderInput()` since they are both used for selecting numbers. If we use `numericInput()`, we'd have to use two inputs, one for the minimum value and one for the maximum. Looking at the documentation for `sliderInput()`, you'll see that by supplying a vector of length two as the `value` argument, it can be used to specify a range rather than a single number. This sounds like what we want in this case, so we'll use `sliderInput()`. 
 
@@ -294,6 +292,25 @@ sliderInput("lengthInput", "Length", 0, 800, c(5, 600))
 ```
 
 Place the code for the slider input inside `sidebarPanel()` (replace the text we wrote earlier with this input).
+
+```r
+library(shiny)
+fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
+
+ui <- fluidPage(
+  titlePanel("Total Length of fishes, 2013 -2016"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("lengthInput", "Length", 0, 800, c(5, 600))
+    ),
+    mainPanel("the results will go here")
+  )
+)
+
+server <- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+```
 
 **Exercise:** Run the code of the `sliderInput()` in the R console and see what it returns. Change some of the parameters of `sliderInput()`, and see how that changes the result.  It's important to truly understand that all these functions in the UI are simply a convenient way to write HTML, as is apparent whenever you run these functions on their own. You could write your own HTML functions for even greater.
 
@@ -312,9 +329,9 @@ For this we want some kind of a text input. But allowing the user to enter text 
 
 Add this input code inside `sidebarPanel()`, after the previous input (separate them with a comma).
 
-> If you look at that input function and think "what if there were 100 species, listing them by hand would not be fun, there's got to be a better way!", then you're right.  This is where [`uiOutput()`](#using-uioutput-to-create-ui-elements-dynamically) comes in handy, but we'll talk about that later.
+> If you look at that input function and think "what if there were 100 species, listing them by hand would not be fun, there's got to be a better way!", then you're right.  This is where `uiOutput()` comes in handy, but we'll talk about that later.
 
-## 6.3 Input for country
+## 6.3 Input for Season
 
 The surveys are conducted during the fishing season in the great lakes, usually late spring or early autumn. Lets create a method for selecting the time of year. The most appropriate input type in this case is probably the select box. Look at the documentation for `selectInput()` and create an input function.
 
@@ -322,6 +339,7 @@ The surveys are conducted during the fishing season in the great lakes, usually 
 ```r
 selectInput("seasonInput", "Season",
             choices = c("Spring","Autumn"))
+            ),
 ```
 
 Add this function as well to your app.  If you followed along, your entire app should have this code:
@@ -334,14 +352,14 @@ fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 ui <- fluidPage(
   titlePanel("Total Length of fishes, 2013 -2016"),
   sidebarLayout(
-  sidebarPanel(
-    sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
-          radioButtons("speciesInput", "Species",
+    sidebarPanel(
+      sliderInput("lengthInput", "Length", 0, 800, c(5, 600)),
+      radioButtons("speciesInput", "Species",
                    choices = c("Alewife", "Smallmouth Bass", "Walleye", "Channel Catfish"),
-                   selected = "Walleye")
-                   selectInput("seasonInput", "Season",
-            choices = c("Spring","Autumn")),
-            )
+                   selected = "Walleye"),
+      selectInput("seasonInput", "Season",
+                  choices = c("Spring","Autumn"))
+    ),
     mainPanel("the results will go here")
   )
 )
@@ -349,10 +367,8 @@ ui <- fluidPage(
 server <- function(input, output) {}
 
 shinyApp(ui = ui, server = server)
-
 ```
 
-[![Shiny add inputs](./img/shiny-addinputs.png)](./img/shiny-addinputs.png)
 
 # 7. Add placeholders for outputs
 
@@ -421,6 +437,9 @@ server <- function(input, output) {}
 shinyApp(ui = ui, server = server)
 ```
 
+If you're having issues, try copying this code into your script window and see if this runs properly.
+
+
 # 9. Implement server logic to create outputs
 
 So far we only wrote code inside that was assigned to the `ui` variable (or code that was written in `ui.R`). That's usually the easier part of a Shiny app. Now we have to write the `server` function, which will be responsible for listening to changes to the inputs and creating outputs to show in the app.
@@ -454,7 +473,7 @@ If you add the code above inside the server function, you should see a plot with
 
 ## 9.2 Making an output react to an input
 
-Now we'll take the plot one step further. Instead of always plotting the same plot (100 random numbers), let's use the minimum price selected as the number of points to show. It doesn't make too much sense, but it's just to learn how to make an output depend on an input.
+Now we'll take the plot one step further. Instead of always plotting the same plot (100 random numbers), let's use the minimum length selected as the number of points to show. It doesn't make too much sense, but it's just to learn how to make an output depend on an input.
 
 
 ```r
@@ -471,7 +490,7 @@ Notice that these short 3 lines of code are using all the 3 rules for building o
 
 ## 9.3 Building the plot output
 
-Now we have all the knowledge required to build a plot visualizing some aspect of the data. We'll create a simple histogram of the alcohol content of the products by using the same 3 rules to create a plot output.
+Now we have all the knowledge required to build a plot visualizing some aspect of the data. We'll create a simple histogram of the legths of selected species of fish by using the same 3 rules to create a plot output.
 
 First we need to make sure `ggplot2` is loaded, so add a `library(ggplot2)` at the top.
 
@@ -480,22 +499,22 @@ Next we'll return a histogram of total lengths from `renderPlot()`. Let's start 
 
 ```r
 output$coolplot <- renderPlot({
-  ggplot(bcl, aes(tl.mm)) +
+  ggplot(fish_len, aes(tl.mm)) +
     geom_histogram()
 })
 ```
 
 If you run the app with this code inside your server, you should see a histogram in the app.  But if you change the input values, nothing happens yet, so the next step is to actually filter the dataset based on the inputs.
 
-Recall that we have 3 inputs: `lengthInput`, `speciesInput`, and `seasonInput`. We can filter the data based on the values of these three inputs. We'll use `dplyr` functions to filter the data, so be sure to include `dplyr` at the top. Then we'll plot the filtered data instead of the original data.
+Recall that we have 3 inputs: `lengthInput`, `speciesInput`, and `seasonInput`. We can filter the data based on the values of these three inputs. We'll use `dplyr` functions to filter the data, so be sure to include `library(dplyr)` at the top. Then we'll plot the filtered data instead of the original data.
 
 
 ```r
 output$coolplot <- renderPlot({
   filtered <-
     fish_len %>%
-    filter(Price >= input$lengthInput[1],
-           Price <= input$lengthInput[2],
+    filter(length >= input$lengthInput[1],
+           length <= input$lengthInput[2],
            Species == input$speciesInput,
            Season == input$seasonInput
     )
@@ -538,23 +557,21 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-output$coolplot <- renderPlot({
-  filtered <-
-    fish_len %>%
-    filter(Price >= input$lengthInput[1],
-           Price <= input$lengthInput[2],
-           Species == input$speciesInput,
-           Season == input$seasonInput
-    )
-  ggplot(filtered, aes(tl.mm)) +
-    geom_histogram()
-})
+  output$coolplot <- renderPlot({
+    filtered <-
+      fish_len %>%
+      filter(tl.mm >= input$lengthInput[1],
+             tl.mm <= input$lengthInput[2],
+             species == input$speciesInput,
+             season == input$seasonInput
+      )
+    ggplot(filtered, aes(tl.mm)) +
+      geom_histogram()
+  })
 }
 
 shinyApp(ui = ui, server = server)
 ```
-
-[![Shiny add plot](./img/shiny-addplot.png)](./img/shiny-addplot.png)
 
 **Exercise:** The current plot doesn't look very nice, you could enhance the plot and make it much more pleasant to look at.
 
@@ -569,8 +586,8 @@ The code for creating the table output should make sense to you without too much
 output$results <- renderTable({
   filtered <-
     bcl %>%
-    filter(Price >= input$priceInput[1],
-           Price <= input$priceInput[2],
+    filter(length >= input$lengthInput[1],
+           length <= input$lengthInput[2],
            Type == input$typeInput,
            Country == input$countryInput
     )
@@ -610,7 +627,7 @@ The above render function accesses two different inputs: `input$mycolour` and `i
 
 ## 10.1 Creating and accessing reactive variables
 
-One very important thing to remember about reactive variables (such as the `input` list) is that **they can only be used inside reactive contexts**. Any `render*` function is a reactive context, so you can always use `input$x` or any other reactive variable inside render functions. There are two other common reactive contexts that we'll get to in a minute: `reactive({})` and `observe({})`. To show you what this means, let's try accessing the price input value in the server function, without explicitly being inside a reactive context. Simply add `print(input$priceInput)` inside the `server` function, and you will get an error when running the app:
+One very important thing to remember about reactive variables (such as the `input` list) is that **they can only be used inside reactive contexts**. Any `render*` function is a reactive context, so you can always use `input$x` or any other reactive variable inside render functions. There are two other common reactive contexts that we'll get to in a minute: `reactive({})` and `observe({})`. To show you what this means, let's try accessing the length input value in the server function, without explicitly being inside a reactive context. Simply add `print(input$lengthInput)` inside the `server` function, and you will get an error when running the app:
 
 ~~~
 Operation not allowed without an active reactive context. (You tried to do something that can only be done from inside a reactive expression or observer.)
@@ -618,15 +635,15 @@ Operation not allowed without an active reactive context. (You tried to do somet
 
 Shiny is very clear about what the error is: we are trying to access a reactive variable outside of a reactive context. To fix this, we can use the `observe({})` function to access the `input` variable.  Inside the server, replace `print(input$lengthInput)` with `observe({ print(input$lengthInput) })`, and now the app should run fine. Note that this `observe({})` statement *depends* on `input$lengthInput`, so whenever you change the value of the length, the code inside this `observe({})` will run again, and the new value will be printed. This is actually a very simple yet useful debugging technique in Shiny: often you want to know what value a reactive variable holds, so you need to remember to wrap the `cat(input$x)` or `print(input$x)` by an `observe({})`.
 
-So far we only saw one reactive variable: the `input` list. You can also create your own reactive variables using the `reactive({})` function. The `reactive({})` function is similar to `observe({})` in that it is also a reactive context, which means that it will get re-run whenever any of the reactive variables in it get updated. The difference between them is that `reactive({})` returns a value. To see it in action, let's create a variable called `lengthDiff` that will be the difference between the maximum and minimum price selected. If you try to naively define `lengthDiff <- diff(input$lengthInput)`, you'll see the same error as before about doing something outside a reactive context. This is because `input$lengthInput` is a reactive variable, and we can't use a reactive variable outside a reactive context. Since we want to assign a value, we use the `reactive({})` function. Try adding the following line to your server:
+So far we only saw one reactive variable: the `input` list. You can also create your own reactive variables using the `reactive({})` function. The `reactive({})` function is similar to `observe({})` in that it is also a reactive context, which means that it will get re-run whenever any of the reactive variables in it get updated. The difference between them is that `reactive({})` returns a value. To see it in action, let's create a variable called `lengthDiff` that will be the difference between the maximum and minimum length selected. If you try to naively define `lengthDiff <- diff(input$lengthInput)`, you'll see the same error as before about doing something outside a reactive context. This is because `input$lengthInput` is a reactive variable, and we can't use a reactive variable outside a reactive context. Since we want to assign a value, we use the `reactive({})` function. Try adding the following line to your server:
 
 ```r
-priceDiff <- reactive({
-  diff(input$priceInput)
+lengthDiff <- reactive({
+  diff(input$lengthInput)
 })
 ```
 
-Now your app will run. If you want to access a reactive variable defined with `reactive({})`, **you must add parentheses after the variable name, as if it's a function**. To demonstrate this, add `observe({ print(priceDiff()) })` to your server function. Notice that we use `priceDiff()` rather than `lengthDiff`. It's very important to remember this, because you can get confusing unclear errors if you simply try to access a custom reactive variable without the parentheses.
+Now your app will run. If you want to access a reactive variable defined with `reactive({})`, **you must add parentheses after the variable name, as if it's a function**. To demonstrate this, add `observe({ print(lengthDiff()) })` to your server function. Notice that we use `lengthDiff()` rather than `lengthDiff`. It's very important to remember this, because you can get confusing unclear errors if you simply try to access a custom reactive variable without the parentheses.
 
 You can think of reactivity as causing a chain reaction: when one reactive value changes, anything that depends on it will get updated. If any of the updated values are themselves reactive variables, then any reactive contexts that depend on those variables will also get updated in turn. As a concrete example, let's think about what happens when you change the value of the `lengthInput` on the page. Since `input$lengthInput` is a reactive variable, any expression that uses it will get updated. This means the two render functions from earlier will execute because they both depend on `input$lengthInput`, as well as the `lengthDiff` variable because it also depends on it. But since `lengthDiff` is itself a reactive variable, Shiny will check if there is anything that depends on `lengthDiff`, and indeed there is - the `observe({})` function that prints tthe value of `lengthDiff`. So once `lengthDiff` gets updated, the `observe({})` function will run, and the value will get printed.
 
@@ -679,7 +696,7 @@ server <- function(input, output) {
 }
 ```
 
-As a reminder, Shiny creates a dependency tree with all the reactive expressions to know what value depends on what other value. For example, when the price input changes, Shiny looks at what values depend on price, and sees that `filtered` is a reactive expression that depends on the price input, so it re-evaluates `filtered`. Then, because `filtered` is changed, Shiny now looks to see what expressions depend on `filtered`, and it finds that the two render functions use `filtered`. So Shiny re-executes the two render functions as well.
+As a reminder, Shiny creates a dependency tree with all the reactive expressions to know what value depends on what other value. For example, when the length input changes, Shiny looks at what values depend on length, and sees that `filtered` is a reactive expression that depends on the length input, so it re-evaluates `filtered`. Then, because `filtered` is changed, Shiny now looks to see what expressions depend on `filtered`, and it finds that the two render functions use `filtered`. So Shiny re-executes the two render functions as well.
 
 # 11. Using uiOutput() to create UI elements dynamically
 
@@ -711,9 +728,9 @@ shinyApp(ui = ui, server = server)
 
 If you run that tiny app, you will see that whenever you change the value of the numeric input, the slider input is re-generated. This behaviour can come in handy often.
 
-## 11.2 Use uiOutput() in our app to populate the countries
+## 11.2 Use uiOutput() in our app to populate the Seasons
 
-We can use this concept in our app to populate the choices for the Season selector. The season selector currently only holds 2 values that we manually entered, but instead we could render the country selector in the server and use the data to determine what season it can have. 
+We can use this concept in our app to populate the choices for the Season selector. The season selector currently only holds 2 values that we manually entered, but instead we could render the Season selector in the server and use the data to determine what season it can have. 
 
 First we need to replace the `selectInput("seasonInput", ...)` in the UI with 
 
@@ -733,13 +750,12 @@ Then we need to create the output (which will create a UI element - yeah, it can
 })
 ```
 
-Now if you run the app, you should be able to see all the countries that BC Liquor stores import from.
-
+\
 ## 11.3 Errors showing up and quickly disappearing
 
-You might notice that when you first run the app, each of the two outputs are throwing an error message, but the error message goes away after a second. The problem is that when the app initializes, `filtered` is trying to access the country input, but the country input hasn't been created yet. After Shiny finishes loading fully and the country input is generated, `filtered` tries accessing it again, this time it's successful, and the error goes away.
+You might notice that when you first run the app, each of the two outputs are throwing an error message, but the error message goes away after a second. The problem is that when the app initializes, `filtered` is trying to access the Season input, but the Season input hasn't been created yet. After Shiny finishes loading fully and the Season input is generated, `filtered` tries accessing it again, this time it's successful, and the error goes away.
 
-Once we understand why the error is happening, fixing it is simple. Inside the `filtered` reactive function, we should check if the country input exists, and if not then just return `NULL`.
+Once we understand why the error is happening, fixing it is simple. Inside the `filtered` reactive function, we should check if the Season input exists, and if not then just return `NULL`.
 
 
 ```r
@@ -772,7 +788,7 @@ output$coolplot <- renderPlot({
 
 The `renderTable()` function doesn't need this fix applied because Shiny doesn't have a problem rendering a `NULL` table.
 
-**Exercise:** Change the product type radio buttons to get generated in the server with the values from the dataset, instead of being created in the UI with the values entered manually. If you're feeling confident, try adding an input for "subtype" that will get re-generated every time a new type is chosen, and will be populated with all the subtype options available for the currently selected type (for example, if WINE is selected, then the subtype are white wine, red wine, etc.).
+**Exercise:** Change the product type radio buttons to get generated in the server with the values from the dataset, instead of being created in the UI with the values entered manually. If you're feeling confident, try adding an input for "subtype" that will get re-generated every time a new type is chosen, and will be populated with all the subtype options available for the currently selected type .
 
 # 12. Final Shiny app code
 
