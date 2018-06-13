@@ -118,7 +118,7 @@ You can also create a new Shiny app using RStudio's menu by selecting *File > Ne
 
 # 4. Load the dataset
 
-The dataset we'll be using is an adaptation of the [Lake Erie Fish Community Data Explorer](https://lebs.shinyapps.io/western-basin/). They provide a direct link to download a *csv* version of the data for their app, and this data has the rare quality that it is immediately clean and useful. You can view the [raw data](https://www.sciencebase.gov/catalog/item/588a3380e4b0ba3b075e8376) they provide.
+The dataset we'll be using is an adaptation of the Lake Erie Fish Community Data Explorer. This data exploration tool is intented for use by researchers, resource managers, and the public to better understand the status of the fish community in Lake Erie. The data were collected as part of a scientific trawl survey to quantify trends in the distribution and abundance of forage and other fish species. The Great Lakes Science Center provides a direct link to download a *csv* version of the data for their app, and this data has the rare quality that it is immediately clean and useful.
 
 The actual file we'll be using is a filtered and processed list of the length of fish surveyed from 2013-2016. The work was done by Taylor Stewart at University of Vermont who has provided the file [here](https://github.com/taylorstewart/lebs-western-basin-app/blob/master/data/WB_ExpandedLengths.csv). Download it now and place this file in the same folder as your Shiny app. Make sure the file is named `WB_ExpandedLengths.csv`.
 
@@ -240,7 +240,6 @@ server <- function(input, output) {}
 shinyApp(ui = ui, server = server)
 ```
 
-[![Shiny layout](./img/shiny-layout.png)](./img/shiny-layout.png)
 
 > If you want to be a lot more flexible with the design, you can have much more fine control over where things go by using a grid layout. We won't cover that here, but if you're interested, look at the documentation for `?column` and `?fluidRow`.
 
@@ -513,10 +512,10 @@ Recall that we have 3 inputs: `lengthInput`, `speciesInput`, and `seasonInput`. 
 output$coolplot <- renderPlot({
   filtered <-
     fish_len %>%
-    filter(length >= input$lengthInput[1],
-           length <= input$lengthInput[2],
-           Species == input$speciesInput,
-           Season == input$seasonInput
+    filter(tl.mm >= input$lengthInput[1],
+           tl.mm <= input$lengthInput[2],
+           species == input$speciesInput,
+           season == input$seasonInput
     )
   ggplot(filtered, aes(tl.mm)) +
     geom_histogram()
@@ -585,17 +584,17 @@ The code for creating the table output should make sense to you without too much
 ```r
 output$results <- renderTable({
   filtered <-
-    bcl %>%
-    filter(length >= input$lengthInput[1],
-           length <= input$lengthInput[2],
-           Type == input$typeInput,
-           Country == input$countryInput
+    fish_len %>%
+    filter(tl.mm >= input$lengthInput[1],
+           tl.mm <= input$lengthInput[2],
+           species == input$speciesInput,
+           season == input$seasonInput
     )
   filtered
 })
 ```
 
-Add this code to your server. Don't overwrite the previous definition of `output$coolplot`, just add this code before or after that, but inside the server function. Run your app, and be amazed! You can now see a table showing all the products at the BC Liquor Store that match your criteria. 
+Add this code to your server. Don't overwrite the previous definition of `output$coolplot`, just add this code before or after that, but inside the server function. Run your app, and be amazed! 
 
 **Exercise:** Add a new output. Either a new plot, a new table, or some piece of text that changes based on the inputs. For example, you could add a text output (`textOutput()` in the UI, `renderText()` in the server) that says how many results were found. If you choose to do this, I recommend first adding the output to the UI, then building the output in the server with static text to make sure you have the syntax correct. Only once you can see the text output in your app you should make it reflect the inputs. Protip: since `textOutput()` is written in the UI, you can wrap it in other UI functions. For example, `h2(textOutput(...))` will result in larger text.
 
@@ -730,7 +729,7 @@ If you run that tiny app, you will see that whenever you change the value of the
 
 ## 11.2 Use uiOutput() in our app to populate the Seasons
 
-We can use this concept in our app to populate the choices for the Season selector. The season selector currently only holds 2 values that we manually entered, but instead we could render the Season selector in the server and use the data to determine what season it can have. 
+We can use this concept in our app to populate the choices for the Season selector. The season selector currently only holds 2 values that we manually entered, but instead we could render the Season selector in the server and use the data to determine what season it can have, so in the future we can add the Winter and Fall season counts to the data, without having to change the code for the app! 
 
 First we need to replace the `selectInput("seasonInput", ...)` in the UI with 
 
