@@ -8,7 +8,7 @@
 
 1. [Prerequisites](#prerequisites)
 2. [What is Shiny?](#what-is-shiny)
-3. [Create an empty Shiny app](#Create-an-empty-Shiny-app)
+3. [Create an empty Shiny app](#create-an-empty-Shiny-app)
 4. [Load the dataset](#load-the-dataset)
 5. [Build the basic UI](#build-the-basic-ui)
 6. [Add inputs to the UI](#add-inputs-to-the-ui)
@@ -21,6 +21,8 @@
 13. [Share your app with the world](#share-your-app-with-the-world)
 14. [References & Resources](#references-&-resources)
 
+*Note the table of contents links dont seem to work right now, issue with Github markdown* 
+*Other links to outside this page work properly*
 
 ## 1. Prerequisites
 
@@ -55,7 +57,7 @@ library(shiny)
 runExample("01_hello")
 ```
 
-If the example app is running, press *Escape* to close the app. 
+If the example app is running, press *Escape* to close the app. You must have the R studio window open for this to work. 
 We will also need some other packages to build the final resulting app in this tutorial, after verifying
 shiny works, try to install the other packages we will need.
 
@@ -493,6 +495,11 @@ Now we have all the knowledge required to build a plot visualizing some aspect o
 
 First we need to make sure `ggplot2` is loaded, so add a `library(ggplot2)` at the top.
 
+```r
+library(shiny)
+library(ggplot2)
+```
+
 Next we'll return a histogram of total lengths from `renderPlot()`. Let's start with just a histogram of the whole data, unfiltered.
 
 
@@ -507,6 +514,12 @@ If you run the app with this code inside your server, you should see a histogram
 
 Recall that we have 3 inputs: `lengthInput`, `speciesInput`, and `seasonInput`. We can filter the data based on the values of these three inputs. We'll use `dplyr` functions to filter the data, so be sure to include `library(dplyr)` at the top. Then we'll plot the filtered data instead of the original data.
 
+```r
+library(shiny)
+library(ggplot2)
+library(dplyr)
+```
+...
 
 ```r
 output$coolplot <- renderPlot({
@@ -749,45 +762,6 @@ Then we need to create the output (which will create a UI element - yeah, it can
 })
 ```
 
-\
-## 11.3 Errors showing up and quickly disappearing
-
-You might notice that when you first run the app, each of the two outputs are throwing an error message, but the error message goes away after a second. The problem is that when the app initializes, `filtered` is trying to access the Season input, but the Season input hasn't been created yet. After Shiny finishes loading fully and the Season input is generated, `filtered` tries accessing it again, this time it's successful, and the error goes away.
-
-Once we understand why the error is happening, fixing it is simple. Inside the `filtered` reactive function, we should check if the Season input exists, and if not then just return `NULL`.
-
-
-```r
-filtered <- reactive({
-  if (is.null(input$seasonInput)) {
-    return(NULL)
-  }    
-  
-    fish_len %>%
-     filter(tl.mm >= input$lengthInput[1],
-            tl.mm <= input$lengthInput[2],
-            species == input$speciesInput,
-            season == input$seasonInput
-    )
-})
-```
-
-Now when the render function tries to access the data, they will get a `NULL` value before the app is fully loaded.  You will still get an error, because the ggplot function will not work with a `NULL` dataset, so we also need to make a similar check in the `renderPlot()` function. Only once the data is loaded, we can try to plot.
-
-
-```r
-output$coolplot <- renderPlot({
-  if (is.null(filtered())) {
-    return()
-  }
-  ggplot(filtered(), aes(tl.mm)) +
-    geom_histogram()
-})
-```
-
-The `renderTable()` function doesn't need this fix applied because Shiny doesn't have a problem rendering a `NULL` table.
-
-**Exercise:** Change the product type radio buttons to get generated in the server with the values from the dataset, instead of being created in the UI with the values entered manually. If you're feeling confident, try adding an input for "subtype" that will get re-generated every time a new type is chosen, and will be populated with all the subtype options available for the currently selected type .
 
 # 12. Final Shiny app code
 
@@ -795,6 +769,9 @@ In case you got lost somewhere, here is the final code. The app is now functiona
 
 
 ```r
+library(shiny)
+library(ggplot2)
+library(dplyr)
 fish_len <- read.csv("WB_ExpandedLengths.csv", stringsAsFactors = FALSE)
 
 ui <- fluidPage(
@@ -892,6 +869,7 @@ The other option for hosting your app is on your own private [Shiny server](http
 - Lake Erie Fish Community Data Explorer app. Written by Taylor R. Stewart (taylor.stewart@uvm.edu). U.S. Geological Survey, Great Lakes Science Center, Lake Erie Biological Station, Sandusky, Ohio.
 - [Source data for Lake Erie fish community](https://www.sciencebase.gov/catalog/item/56951c63e4b039675d005ed9)
 - Stewart, T.R., 2016, Lake Erie Fish Community Data, 2013-2015: U.S. Geological Survey data release, https://doi.org/10.5066/F79C6VHJ. 
+
 # 14.1. Ideas to improve the app
 
 Here are some additional ideas to explore
