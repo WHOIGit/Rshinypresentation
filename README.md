@@ -24,8 +24,23 @@ The aim of this workshop is to take you step-by-step through the construction of
 
 You'll need to bring this to the workshop. Try to get your software and enviroment ready before the presentation. Come early to the presentation and I'll be around to help with any install isses.
 
-1. A laptop computer with <a href = "https://www.rstudio.com/products/rstudio/download/#download" target = "_blank">Rstudio 1.1.447 </a> installed and <a href = "http://mirrors.nics.utk.edu/cran/" target = "_blank">R 3.5.0 </a>
-2. Familiarity with R: We'll assume some basic facility in R programming and that you can at least read and understand R code that creates custom plots in R's base graphics system. For the most part our explanation of R code will be limited to its relationship to app-building.
+1. A laptop computer with the following already installed:
 
-`we will be going over how to install shiny and dependencies during the presentation`
+[R base 3.5.0](http://mirrors.nics.utk.edu/cran/)
+
+
+[RStudio 1.1.447](https://www.rstudio.com/products/rstudio/download/#download)
+
+Install the binary or .exe to your operating system of choice. Then, open R studio and install the R packages we will need for this workshop.
+
+
+```r
+install.packages("shiny")
+install.packages("dplyr")
+install.packages("ggplot2")
+```
+
+You can come early to the presentation for assisance with installing packages.
+
+2. Familiarity with R: We'll assume some basic facility in R programming and that you can at least read and understand R code that creates custom plots in R's base graphics system. For the most part our explanation of R code will be limited to its relationship to app-building.
 
