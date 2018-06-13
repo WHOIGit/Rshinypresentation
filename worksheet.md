@@ -71,11 +71,11 @@ Shiny is a package from RStudio that can be used to build interactive web pages 
 
 You can do quite a lot with Shiny: think of it as an easy way to make an interactive web page, and that web page can seamlessly interact with R and display R objects (plots, tables, of anything else you do in R).
 
-This tutorial is a hands-on activity complement to today's Lunch and Learn. In this activity, we'll walk through all the steps of building a Shiny app using a dataset that lets you explore the products available at the BC chain of liquor stores. Copy and paste the code into a fresh R script and follow along with the presentation. 
+This tutorial is a hands-on activity complement to today's Lunch and Learn. In this activity, we'll walk through all the steps of building a simple shiny app that reads a stored dataset and displays a histogram that can be created dynamically by changing inputs in the app. Copy and paste the code into a fresh R script and follow along with the presentation. 
 
-This tutorial should take approximately an hour to complete. Any activity deemed as an exercise throughout this tutorial is not mandatory for building our app, but they are good for getting more practice with Shiny.  The final app also includes a few extra features that are left as exercises for the reader.
+This tutorial should take approximately an hour to complete. Any activity deemed as an exercise throughout this tutorial is not mandatory for building our app, but they are good for getting more practice with Shiny. We will also not be covering reactivity in section 10, we in the interest of time will be stopping at section 9 which covers most of the basic user interface and server interactions.  The final app also includes a few extra features that are left as exercises for the reader.
 
-If you want even more practice, another great tutorial is the [official Shiny tutorial](http://shiny.rstudio.com/tutorial/). RStudio also provides a [handy cheatsheet](https://www.rstudio.com/resources/cheatsheets/) to remember all the little details after you already learned the basics.
+If you want even more practice, another great tutorial is the [official Shiny tutorial](http://shiny.rstudio.com/tutorial/). RStudio also provides a [handy cheatsheet](https://www.rstudio.com/resources/cheatsheets/) to remember all the little details after you already learned the basics. I would also strongly encourage those willing to invest time into learning shiny to cover reactivity as it is a core feature of the package.
 
 
 # 3. Create an empty Shiny app
